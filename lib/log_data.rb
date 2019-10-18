@@ -3,6 +3,12 @@
 require_relative 'log_visit'
 
 class LogData
+  class LogNotFound < StandardError
+    def initialize(msg = 'No log file')
+      super
+    end
+  end
+
   attr_reader :path, :log_visits
 
   def initialize(path)
@@ -21,10 +27,14 @@ class LogData
   private
 
   def parse_file
-    File.read(path).each_line.map do |line|
-      url, ip = line.split
-      LogVisit.new(url: url, ip_address: ip)
+    begin
+      File.open(path, 'r').each_line.map do |line|
+        url, ip = line.split
+        LogVisit.new(url: url, ip_address: ip)
+      end
     end
+  rescue Errno::ENOENT
+    raise LogNotFound
   end
 
   def group_by_urls

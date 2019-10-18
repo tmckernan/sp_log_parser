@@ -3,12 +3,14 @@
 require "optparse"
 
 class CLIOptions
+  attr_reader :options
+
   def initialize(args = [])
     @options = parse_args(args)
   end
 
   def path
-    @options.fetch(:file_path)
+    options.fetch(:file_path)
   end
 
   private
