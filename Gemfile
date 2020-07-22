@@ -7,3 +7,4 @@ ruby '2.6.3'
 gem 'rspec'
 gem 'rubocop', require: false
 gem 'terminal-table'
+gem 'simplecov', require: false
