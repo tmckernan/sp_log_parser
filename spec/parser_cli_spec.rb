@@ -4,8 +4,8 @@ require "spec_helper"
 require "parser_cli"
 
 describe ParserCli do
-  let(:file_path) { 'spec/support/test.log'  }
-  subject { described_class.new.run(file_path)}
+  let(:file_path) { 'spec/support/test.log' }
+  subject { described_class.new.run(file_path) }
   context "#run" do
     it "return terminal-tables" do
       expect(subject.count).to eq(2)
