@@ -1,59 +1,19 @@
 # frozen_string_literal: true
 
-require_relative 'log_visit'
+require_relative 'log_entry'
 
 class LogData
-  class LogNotFound < StandardError
-    def initialize(msg = 'No log file')
-      super
-    end
+  attr_reader :data
+
+  def initialize(data = {})
+    @data = data
   end
 
-  attr_reader :path, :log_visits
+  def add_entry(entry)
+    paths = @data[entry.path]
 
-  def initialize(path)
-    @path = path
-    @log_visits = parse_file
-  end
+    return @data[entry.path] = Hash[entry.ip, 1] if paths.nil?
 
-  def counts_ordered_by_urls
-    sort_urls(urls_count)
-  end
-
-  def unique_counts_ordered_by_urls
-    sort_urls(url_unique_counts)
-  end
-
-  private
-
-  def parse_file
-    begin
-      File.open(path, 'r').each_line.map do |line|
-        url, ip = line.split
-        LogVisit.new(url: url, ip_address: ip)
-      end
-    end
-  rescue Errno::ENOENT
-    raise LogNotFound
-  end
-
-  def group_by_urls
-    @group_by_urls ||= log_visits.group_by(&:url)
-  end
-
-  def urls_count
-    group_by_urls.map do |url, visits|
-      [url, visits.count]
-    end
-  end
-
-  def url_unique_counts
-    group_by_urls.map do |key, value|
-      [key, value.map(&:ip_address).uniq.count]
-    end
-  end
-
-  def sort_urls(values)
-    values.sort { |a, b| b.last <=> a.last }
+    paths[entry.ip].nil? ? paths[entry.ip] = 1 : paths[entry.ip] += 1
   end
 end

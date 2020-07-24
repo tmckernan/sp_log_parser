@@ -1,34 +1,28 @@
 # frozen_string_literal: true
 
-require "spec_helper"
-require "log_data"
+require 'spec_helper'
+require 'log_data'
 
 describe LogData do
-  let(:path) { 'spec/support/test.log' }
-  let(:log_data) { described_class.new(path) }
+  let(:path) { '/some/endpoint' }
+  let(:ip) { '1.2.3.4' }
+  let(:log_entry) { instance_double(LogEntry, path: path, ip: ip) }
 
-  context "#counts_ordered_by_urls" do
-    let(:results) { [["/help_page/1", 5], ["/home", 3]] }
-    subject { log_data.counts_ordered_by_urls }
+  describe '#add_entry' do
+    context 'when entry exists' do
+      subject { described_class.new(path => { ip => 1 }) }
 
-    it 'return list of visits group by url' do
-      expect(subject).to match_array(results)
-    end
-
-    context 'no log file' do
-      let(:path) { 'missing.log' }
-      let(:error_klass) { LogData::LogNotFound }
-
-      it 'return list of visits group by url' do
-        expect { subject }.to raise_exception(error_klass)
+      it 'increments visits count' do
+        subject.add_entry(log_entry)
+        expect(subject.data[path][ip]).to eq 2
       end
     end
-  end
 
-  context "unique_counts_ordered_by_urls" do
-    let(:results) { [["/help_page/1", 4], ["/home", 2]] }
-    it 'return unique vists group by url' do
-      expect(log_data.unique_counts_ordered_by_urls).to match_array(results)
+    context "when entry doesn't exist" do
+      it 'adds the entry with one visit' do
+        subject.add_entry(log_entry)
+        expect(subject.data[path][ip]).to eq 1
+      end
     end
   end
 end
