@@ -24,10 +24,42 @@ list of webpages with most unique page views also ordered
          /index     5 unique views
          etc.
 
+# Approach
 
-## Working example
+Each Line in the logfile is parse into `LogData`.
 
-       ./parser.rb -p webserver.log
+The log file is praser in the following steps:
+
+1. A line of the logfile is passed to the `LogEntry` object.
+
+2. The `LogEntry` object is saved to the `LogData`
+
+    The LogData has the following structure
+    `{ <path> => { <ip> => <visits> } }`
+
+3. `Counter` calulated the number of visits by accepeting the parser data from `LogData` and returning an array of `LogVisits`.
+
+- `Logvisits` is a simple value object which holds path and number of visits.
+
+4. `Sorter` accepts an Array of `LogVisits` objects and return sorted array of objects from highest to lowest visits.
+
+5. `ParserCli` prints the following two tables:
+  - All visits to a given path order by high to low visits
+  - Unique visits to a given path order by high to low visits
+
+# Usage
+## Install
+  1. Clone the repository
+  2. run `bundle install` to install gems
+
+## Test
+  - Run specs: `bundle exec rspec`
+  - Run linter: `bundle exec rubocop`
+
+## Run Working example
+
+      `./parser.rb webserver.log`
+
       +------------------+-----------------+
       | Urls order by visits (high to low) |
       +------------------+-----------------+
